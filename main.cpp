@@ -14,13 +14,16 @@
 #include <glm/glm.hpp>
 #include "Screenshot.h"
 #include "Scene.h"
+#include "Image.h"
 
 
 static const int width = 800;
 static const int height = 600;
 static const char* title = "Scene viewer";
+static bool rayTrace = false;
 static const glm::vec4 background(0.1f, 0.2f, 0.3f, 1.0f);
 static Scene scene;
+static Image image(width, height);
 
 #include "hw3AutoScreenshots.h"
 
@@ -48,18 +51,24 @@ void initialize(void){
     // Initialize scene
     scene.init();
 
+    // Initialize image
+    image.init();
+
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
 }
 
 void display(void){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
-    scene.draw();
-    
+
+    if(rayTrace){
+        image.draw();
+    } else {
+        scene.draw();
+    }
+
     glutSwapBuffers();
     glFlush();
-    
 }
 
 void saveScreenShot(const char* filename = "test.png"){
@@ -95,6 +104,10 @@ void keyboard(unsigned char key, int x, int y){
             break;
         case 'l':
             scene.shader -> enablelighting = !(scene.shader -> enablelighting);
+            glutPostRedisplay();
+            break;
+        case 'i':
+            rayTrace = !rayTrace;
             glutPostRedisplay();
             break;
         case ' ':
