@@ -4,6 +4,8 @@
         "*.html": "html",
         "iosfwd": "cpp",
         "vector": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "string": "cpp",
+        "deque": "cpp"
     }
 }
