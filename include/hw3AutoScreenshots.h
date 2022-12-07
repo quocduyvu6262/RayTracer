@@ -9,11 +9,11 @@ void hw3AutoScreenshots(){
     scene.camera -> reset();
     scene.shader -> enablelighting = false;
     display();
-    saveScreenShot("image-00.png");
+    saveScreenShot("results/image-00.png");
     
     keyboard('l',0,0);
     display();
-    saveScreenShot("image-01.png");
+    saveScreenShot("results/image-01.png");
     
     keyboard('a',0,0);
     keyboard('a',0,0);
@@ -24,7 +24,7 @@ void hw3AutoScreenshots(){
     specialKey(GLUT_KEY_RIGHT,0,0);
     specialKey(GLUT_KEY_RIGHT,0,0);
     display();
-    saveScreenShot("image-02.png");
+    saveScreenShot("results/image-02.png");
     
     for (int count = 0; count < 8; count ++){
         keyboard('z',0,0);
@@ -36,7 +36,7 @@ void hw3AutoScreenshots(){
         specialKey(GLUT_KEY_DOWN,0,0);
     }
     display();
-    saveScreenShot("image-03.png");
+    saveScreenShot("results/image-03.png");
     
     scene.camera -> reset();
     scene.shader -> enablelighting = false;
