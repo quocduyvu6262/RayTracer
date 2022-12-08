@@ -6,6 +6,7 @@
         "vector": "cpp",
         "iostream": "cpp",
         "string": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "__split_buffer": "cpp"
     }
 }

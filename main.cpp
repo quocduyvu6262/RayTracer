@@ -14,7 +14,8 @@
 #include <glm/glm.hpp>
 #include "Screenshot.h"
 #include "Scene.h"
-#include "Image.h"
+#include "RTVersion/Image.h"
+#include "RTVersion/RayTracer.h"
 
 
 static const int width = 800;
@@ -23,7 +24,10 @@ static const char* title = "Scene viewer";
 static bool rayTrace = false;
 static const glm::vec4 background(0.1f, 0.2f, 0.3f, 1.0f);
 static Scene scene;
+static RTScene rtscene;
+
 static Image image(width, height);
+
 
 #include "hw3AutoScreenshots.h"
 
@@ -53,6 +57,14 @@ void initialize(void){
 
     // Initialize image
     image.init();
+
+    // Initialize ray tracing scene
+    rtscene.init();
+    rtscene.camera -> zoom(0.9f);
+    rtscene.camera -> rotateUp(15.0f); 
+    rtscene.camera -> rotateRight(30.0f);
+    rtscene.buildTriangleSoup();
+    RayTracer::Raytrace(*(rtscene.camera), rtscene, image);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);

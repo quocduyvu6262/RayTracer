@@ -20,7 +20,8 @@ that loads an obj file.
 #include <GL/glut.h>
 #endif
 
-#include "RTObj.h"
+#include "../../include/RTVersion/RTObj.h"
+#include "../../include/RTVersion/Triangle.h"
 
 void RTObj::init(const char * filename){
     std::vector< glm::vec3 > temp_vertices, vertices;
@@ -79,19 +80,31 @@ void RTObj::init(const char * filename){
     std::cout << "done." << std::endl;
     
     // fill in triangles
+    std::cout << "Setting up triangles...";
     count = n/3;
     int pos_index = 0;
     int nor_index = 0;
     count = 24 / 3;
     for (unsigned int i=0; i<count; i++){
-        elements[i] -> P[0] = vertices[pos_index++];
-        elements[i] -> P[1] = vertices[pos_index++];
-        elements[i] -> P[2] = vertices[pos_index++];
+        Triangle toAddTriangle;
 
-        elements[i] -> N[0] = normals[nor_index++];
-        elements[i] -> N[1] = normals[nor_index++];
-        elements[i] -> N[2] = normals[nor_index++];
+        int index = pos_index;
+        toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
+        index = pos_index++;
+        toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
+        index = pos_index++;
+        toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
+
+        index = nor_index;
+        toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0],normals[indices[index]][1],normals[indices[index]][2]));
+        index = nor_index++;
+        toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0],normals[indices[index]][1],normals[indices[index]][2]));
+        index = nor_index++;
+        toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0],normals[indices[index]][1],normals[indices[index]][2]));
+
+        elements.push_back(toAddTriangle);
     }
+    std::cout << "done.\n";
 }
 
 
