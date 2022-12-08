@@ -54,25 +54,27 @@ public:
         // fill in triangles
         int pos_index = 0;
         int nor_index = 0;
-        count = 24 / 3;
-        for (unsigned int i=0; i<count; i++){
+        count = sizeof(indices) / sizeof(indices[0]);
+        for (unsigned int i=0; i<count/3; i++){
             Triangle toAddTriangle; 
-            int index = pos_index++;
-            toAddTriangle.P.push_back(glm::vec3(positions[indices[index]][0],positions[indices[index]][1],positions[indices[index]][2]));
-            index = pos_index++;
-            toAddTriangle.P.push_back(glm::vec3(positions[indices[index]][0],positions[indices[index]][1],positions[indices[index]][2]));
-            index = pos_index++;
-            toAddTriangle.P.push_back(glm::vec3(positions[indices[index]][0],positions[indices[index]][1],positions[indices[index]][2]));
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
 
-            index = nor_index++;
-            toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0], normals[indices[index]][1], normals[indices[index]][2]));
-            index = nor_index++;
-            toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0], normals[indices[index]][1], normals[indices[index]][2]));
-            index = nor_index++;
-            toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0], normals[indices[index]][1], normals[indices[index]][2]));
-
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            
             elements.push_back(toAddTriangle);
         }
+
+        
     }
 };
 
