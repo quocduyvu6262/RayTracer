@@ -67,7 +67,8 @@ namespace RayTracer{
 
     glm::vec3 FindColor(Intersection hit, int recursion_depth, RTScene* scene) {
         glm::vec4 color;
-
+        Material* m;
+        
         if(hit.dist == INFINITY) { // if color not visible
             color = glm::vec4(0);
         } else { // Shading model
@@ -82,8 +83,7 @@ namespace RayTracer{
             glm::vec3 halfwaydirection;
             glm::vec3 viewdirection;
             Ray raytolight;
-            Intersection checkShadow;
-            Material* m;
+            Intersection checkShadow;            
             int nlights = (scene -> light).size();
             std::vector<glm::vec4> lightpositions;
             std::vector<glm::vec4> lightcolors;
