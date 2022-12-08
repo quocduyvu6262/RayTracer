@@ -3,6 +3,7 @@ RTCube is subclass class of RTGeometry
 that represents a ray tracing 3D cube.
 *****************************************************/
 #include "RTGeometry.h"
+#include "Triangle.h"
 #ifndef __CUBE_H__
 #define __CUBE_H__
 
@@ -53,16 +54,27 @@ public:
         // fill in triangles
         int pos_index = 0;
         int nor_index = 0;
-        count = 24 / 3;
-        for (unsigned int i=0; i<count; i++){
-            elements[i] -> P[0] = positions[pos_index++];
-            elements[i] -> P[1] = positions[pos_index++];
-            elements[i] -> P[2] = positions[pos_index++];
+        count = sizeof(indices) / sizeof(indices[0]);
+        for (unsigned int i=0; i<count/3; i++){
+            Triangle toAddTriangle; 
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
+            toAddTriangle.P.push_back(glm::vec3(positions[indices[pos_index]][0],positions[indices[pos_index]][1],positions[indices[pos_index]][2]));
+            pos_index += 1;
 
-            elements[i] -> N[0] = normals[nor_index++];
-            elements[i] -> N[1] = normals[nor_index++];
-            elements[i] -> N[2] = normals[nor_index++];
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            toAddTriangle.N.push_back(glm::vec3(normals[indices[nor_index]][0], normals[indices[nor_index]][1], normals[indices[nor_index]][2]));
+            nor_index += 1;
+            
+            elements.push_back(toAddTriangle);
         }
+
+        
     }
 };
 

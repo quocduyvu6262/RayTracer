@@ -1,9 +1,9 @@
 /**************************************************
 Scene.cpp contains the implementation of the draw command
 *****************************************************/
-#include "RTScene.h"
-#include "RTCube.h"
-#include "RTObj.h"
+#include "../../include/RTVersion/RTScene.h"
+#include "../../include/RTVersion/RTCube.h"
+#include "../../include/RTVersion/RTObj.h"
 
 // The scene init definition 
 #include "RTScene.inl"
@@ -11,36 +11,19 @@ Scene.cpp contains the implementation of the draw command
 
 using namespace glm;
 void RTScene::buildTriangleSoup(void){
-    // Pre-draw sequence: assign uniforms that are the same for all Geometry::draw call.  These uniforms include the camera view, proj, and the lights.  These uniform do not include modelview and material parameters.
-    camera -> computeMatrices();
-    shader -> view = camera -> view;
-    shader -> projection = camera -> proj;
-    shader -> nlights = light.size();
-    shader -> lightpositions.resize( shader -> nlights );
-    shader -> lightcolors.resize( shader -> nlights );
-    int count = 0;
-    for (std::pair<std::string, Light*> entry : light){
-        shader -> lightpositions[ count ] = (entry.second) -> position;
-        shader -> lightcolors[ count ] = (entry.second) -> color;
-        count++;
-    }
-    
+   
     // Define stacks for depth-first search (DFS)
-    std::stack < Node* > dfs_stack;
+    std::stack < RTNode* > dfs_stack;
     std::stack < mat4 >  matrix_stack; // HW3: You will update this matrix_stack during the depth-first search while loop.
     
     // Initialize the current state variable for DFS
-    Node* cur = node["world"]; // root of the tree
+    RTNode* cur = node["world"]; // root of the tree
     mat4 cur_VM = camera -> view; // HW3: You will update this current modelview during the depth first search.  Initially, we are at the "world" node, whose modelview matrix is just camera's view matrix.
     
-    // HW3: The following is the beginning of the depth-first search algorithm.
-    // HW3: The depth-first search for the node traversal has already been implemented (cur, dfs_stack).
-    // HW3: All you have to do is to also update the states of (cur_VM, matrix_stack) alongside the traversal.  You will only need to modify starting from this line.
+    // Update the states of (cur_VM, matrix_stack) alongside the traversal.  You will only need to modify starting from this line.
     dfs_stack.push(cur);
-    /**
-     * TODO: (HW3 hint: you should do something here)
-     */
     matrix_stack.push(cur_VM);
+
     // Compute total number of connectivities in the graph; this would be an upper bound for
     // the stack size in the depth first search over the directed acyclic graph
     int total_number_of_edges = 0; 
@@ -66,16 +49,33 @@ void RTScene::buildTriangleSoup(void){
         // draw all the models at the current node
         for ( size_t i = 0; i < cur -> models.size(); i++ ){
             // Prepare to draw the geometry. Assign the modelview and the material.
+            glm::mat4 curModelView = cur_VM * cur->modeltransforms[i];
+            glm::mat3 inverseModelView = glm::inverse(glm::transpose(glm::mat3(curModelView)));
+            Material* curMaterial = cur->models[i]->material;
+
+            for(Triangle t : cur -> models[i] -> geometry -> elements){
+                Triangle transformedTriangle;
+
+                // add transformed position to triangle
+                glm::vec4 transformedPos = curModelView * glm::vec4(t.P[0], 1);
+                transformedTriangle.P.push_back(glm::vec3(transformedPos.x,transformedPos.y,transformedPos.z));
+                transformedPos = curModelView * glm::vec4(t.P[1], 1);
+                transformedTriangle.P.push_back(glm::vec3(transformedPos.x,transformedPos.y,transformedPos.z));
+                transformedPos = curModelView * glm::vec4(t.P[2], 1);
+                transformedTriangle.P.push_back(glm::vec3(transformedPos.x,transformedPos.y,transformedPos.z));
+
+                // add transformed normal to triangle
+                transformedTriangle.N.push_back(inverseModelView*t.N[0]);
+                transformedTriangle.N.push_back(inverseModelView*t.N[1]);
+                transformedTriangle.N.push_back(inverseModelView*t.N[2]);
+                
+                // add material
+                transformedTriangle.material = curMaterial;
+
+                // add transformed triangle to triangle soup
+                triangle_soup.push_back(transformedTriangle);
+            }
             
-            /**
-             * TODO: (HW3 hint: you should do something here)
-             */
-            shader -> modelview = cur_VM * cur -> modeltransforms[i]; // TODO: HW3: Without updating cur_VM, modelview would just be camera's view matrix.
-            shader -> material  = ( cur -> models[i] ) -> material;
-            
-            // The draw command
-            shader -> setUniforms();
-            ( cur -> models[i] ) -> geometry -> draw();
         }
         
         // Continue the DFS: put all the child nodes of the current node in the stack
