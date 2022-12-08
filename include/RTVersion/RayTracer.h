@@ -1,13 +1,11 @@
 #include "Ray.h"
 #include "Intersection.h"
-#include "../Camera.h"
+#include "Triangle.h"
 #include "RTScene.h"
-#include "Image.h"
 #include <iostream>
-
 namespace RayTracer{
 
-    Ray RayThruPixel(Camera cam, int i, int j, int width, int height){
+    Ray RayThruPixel(Camera cam, int i, int j, int width, int height) {
         glm::vec3 source = cam.eye;
         float alpha = 2*(i+0.5)/width-1;
         float beta = 1-2*(j+0.5)/height;
@@ -22,20 +20,18 @@ namespace RayTracer{
         return result;
     }
 
-    Intersection Intersect(Ray ray, Triangle* triangle){
+    Intersection Intersect(Ray ray, Triangle* triangle) {
         Intersection result;
         result.triangle = triangle;
-            
-        glm::vec4 rayPos = glm::vec4(ray.p0,1);
-        glm::mat4 matrix = {
-            glm::vec4(triangle->P[0],1).x, glm::vec4(triangle->P[0],1).y, glm::vec4(triangle->P[0],1).z, 1,
-            glm::vec4(triangle->P[1],1).x, glm::vec4(triangle->P[1],1).y, glm::vec4(triangle->P[1],1).z, 1,
-            glm::vec4(triangle->P[2],1).x, glm::vec4(triangle->P[2],1).y, glm::vec4(triangle->P[2],1).z, 1,
-            glm::vec4(-ray.dir,0).x, glm::vec4(-ray.dir,0).y, glm::vec4(-ray.dir,0).z, 0
-        };
-        glm::vec4 lambdas = glm::inverse(matrix)*rayPos;
+        glm::vec4 raypos = glm::vec4(ray.p0,1);
+        glm::mat4 posit;
+        posit[0] = glm::vec4(triangle->P[0],1);
+        posit[1] = glm::vec4(triangle->P[1],1);
+        posit[2] = glm::vec4(triangle->P[2],1);
+        posit[3] = glm::vec4(-ray.dir,0);
+        glm::vec4 lambdas = glm::inverse(posit)*raypos;
 
-        // there is an intersection if lambdas >= 0
+        // there is an intersection
         if(lambdas.x>=0 && lambdas.y>=0 && lambdas.z>=0 && lambdas.w>=0) {
             glm::vec3 q = lambdas.x*triangle->P[0] + lambdas.y*triangle->P[1] + lambdas.z*triangle->P[2];
             glm::vec3 n = glm::normalize(lambdas.x*triangle->N[0] + lambdas.y*triangle->N[1] + lambdas.z*triangle->N[2]);
@@ -43,24 +39,32 @@ namespace RayTracer{
             result.N = n;
             result.V = -ray.dir;
             result.dist = lambdas.w;
-        } else { 
+        } else { // there is no intersection
             result.dist = INFINITY;
         }
         return result;
     }
-    Intersection Intersect(Ray ray, RTScene* scene){
+
+    Intersection Intersect(Ray ray, RTScene* sceneptr) {
         float minDist = INFINITY;
         Intersection hit;
-        for(Triangle obj : scene -> triangle_soup){
-            Intersection hit_temp = Intersect(ray, &obj);
-            if(hit_temp.dist < minDist){
+        hit.dist = minDist;
+        std::vector<Triangle> list = sceneptr -> triangle_soup;
+        Triangle* tri;
+        int numTri = list.size();
+        for(int i=0; i<numTri; i++) {
+            tri = &(list[i]);
+            Intersection hit_temp = Intersect(ray, tri);
+            if(hit_temp.dist < minDist) {
                 minDist = hit_temp.dist;
                 hit = hit_temp;
             }
         }
+
         return hit;
     }
-    glm::vec3 FindColor(Intersection hit, int recursion_depth, RTScene* sceneptr){
+
+    glm::vec3 FindColor(Intersection hit, int recursion_depth, RTScene* sceneptr) {
         glm::vec4 color;
         Material* m;
         
@@ -136,18 +140,17 @@ namespace RayTracer{
         }
         return color;
     }
-
-    void Raytrace(Camera cam, RTScene scene, Image &image){
-        std::cout << "Processing ray tracing image..."<<std::endl;
+    void Raytrace(Camera cam, RTScene scene, Image &image) {
         int w = image.width; int h = image.height;
+        std::cout<<"Processing ray tracing image...\n";
         for (int j=0; j<h; j++){ 
             for (int i=0; i<w; i++){ 
+                //std::cout << i << "," << j << "\n";
                 Ray ray = RayThruPixel(cam, i, j, w, h);
                 Intersection hit = Intersect(ray, &scene);
                 image.pixels[i+j*w] = FindColor(hit, 3, &scene);
             }
         }
-        std::cout <<"done ray tracing."<<std::endl;
+        std::cout<<"done...\n";
     }
-
-};
+}

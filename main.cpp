@@ -15,8 +15,9 @@
 #include "Screenshot.h"
 #include "Scene.h"
 #include "RTVersion/Image.h"
+#include "RTVersion/RTScene.h"
 #include "RTVersion/RayTracer.h"
-
+using namespace RayTracer;
 
 static const int width = 800;
 static const int height = 600;
@@ -64,7 +65,7 @@ void initialize(void){
     rtscene.camera -> rotateUp(15.0f); 
     rtscene.camera -> rotateRight(30.0f);
     rtscene.buildTriangleSoup();
-    RayTracer::Raytrace(*(rtscene.camera), rtscene, image);
+    Raytrace(*(rtscene.camera), rtscene, image);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);

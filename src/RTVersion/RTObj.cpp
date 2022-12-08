@@ -88,14 +88,14 @@ void RTObj::init(const char * filename){
     for (unsigned int i=0; i<count; i++){
         Triangle toAddTriangle;
 
-        int index = pos_index;
+        int index = pos_index++;
         toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
         index = pos_index++;
         toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
         index = pos_index++;
         toAddTriangle.P.push_back(glm::vec3(vertices[indices[index]][0],vertices[indices[index]][1],vertices[indices[index]][2]));
 
-        index = nor_index;
+        index = nor_index++;
         toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0],normals[indices[index]][1],normals[indices[index]][2]));
         index = nor_index++;
         toAddTriangle.N.push_back(glm::vec3(normals[indices[index]][0],normals[indices[index]][1],normals[indices[index]][2]));
